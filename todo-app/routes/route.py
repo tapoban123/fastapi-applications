@@ -47,3 +47,24 @@ def edit_task(task_id: int, new_task: EditTaskBase, db: db_dependency):
     db.commit()
 
     return {"detail": task_model}
+
+
+@router.get("/get-tasks")
+def get_all_tasks(db: db_dependency):
+    tasks = db.query(db_models.Tasks).all()
+    return {"details": {"tasks": tasks}}
+
+
+@router.delete("/delete-task/{task_id}")
+def delete_task(task_id: int, db: db_dependency):
+    task_model = db.query(db_models.Tasks).filter(db_models.Tasks.id == task_id).first()
+    if task_model is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"No task exists by id: {task_id}",
+        )
+
+    db.query(db_models.Tasks).filter(db_models.Tasks.id == task_id).delete()
+    db.commit()
+
+    return {"deleted": task_model}
