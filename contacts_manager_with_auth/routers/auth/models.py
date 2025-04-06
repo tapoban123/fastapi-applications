@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-import datetime
+from datetime import datetime
 
 
 class BaseUserCredentialRequest:
@@ -11,12 +11,12 @@ class CreateUser(BaseUserCredentialRequest, BaseModel):
     name: str
 
 
-class LoginUser(BaseUserCredentialRequest, BaseModel):
-    pass
-
-
-class DeleteUser(BaseUserCredentialRequest, BaseModel):
-    pass
+class FetchUserInfo(BaseModel):
+    id: int
+    name: str
+    email: str
+    creation_date: datetime
+    account_updated: datetime | None
 
 
 class Token(BaseModel):
