@@ -57,7 +57,7 @@ def login(formdata: Annotated[OAuth2PasswordRequestForm, Depends()], db: db_depe
     return {"token_type": "Bearer", "access_token": token}
 
 
-@router.post("/authenticate-user", response_model=FetchUserInfo)
+@router.get("/authenticate-user", response_model=FetchUserInfo)
 async def authenticate_user_by_token(token: str, db: db_dependency):
     try:
         payload = jwt.decode(token, key=SECRET_KEY, algorithms=[ALGORITHM])
