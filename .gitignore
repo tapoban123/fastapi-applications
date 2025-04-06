@@ -3,3 +3,6 @@
 
 # libraries and packages
 venv/
+
+# cache
+__pycache__/
