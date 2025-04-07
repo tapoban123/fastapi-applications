@@ -3,10 +3,15 @@ from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy import create_engine
 from fastapi import Depends
 from typing import Annotated
+from dotenv import load_dotenv
+import os
 
-SQLITE_DATABASE_URL = "sqlite:///./users.db"
+load_dotenv()
 
-engine = create_engine(SQLITE_DATABASE_URL, connect_args={"check_same_thread": False})
+DB_URL = os.environ.get("DATABASE_URL")
+SQLITE_DATABASE_URL = DB_URL
+
+engine = create_engine(SQLITE_DATABASE_URL)
 
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
