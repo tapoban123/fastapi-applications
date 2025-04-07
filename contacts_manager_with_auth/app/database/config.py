@@ -1,6 +1,8 @@
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy import create_engine
+from fastapi import Depends
+from typing import Annotated
 
 SQLITE_DATABASE_URL = "sqlite:///./users.db"
 
@@ -17,3 +19,6 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+db_dependency = Annotated[Session, Depends(get_db)]

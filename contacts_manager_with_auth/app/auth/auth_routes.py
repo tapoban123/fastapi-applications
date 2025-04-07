@@ -1,15 +1,15 @@
 from fastapi import APIRouter, status, Depends, HTTPException
-from routers.auth.models import CreateUser, Token, FetchUserInfo
+from .models import CreateUser, Token, FetchUserInfo
 from passlib.context import CryptContext
-from database.models import Users, Contacts
+from ..database.models import Users
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
-from database.config import get_db, Session
+from ..database.config import db_dependency
 from typing import Annotated
 from jose import jwt, JWTError
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
+import uuid
 import os
-
 
 load_dotenv()
 
@@ -23,14 +23,14 @@ bcrypt_context = CryptContext(
     deprecated="auto",
 )
 
-# oauth2_bearer = OAuth2PasswordBearer(tokenUrl="auth/token")
 
-db_dependency = Annotated[Session, Depends(get_db)]
+# oauth2_bearer = OAuth2PasswordBearer(tokenUrl="auth/token")
 
 
 @router.post("/create-user", status_code=status.HTTP_201_CREATED, response_model=Token)
 def create_user(credentials: CreateUser, db: db_dependency):
     user_model = Users(
+        id=uuid.uuid4().hex,
         name=credentials.name,
         email=credentials.email,
         password=bcrypt_context.hash(credentials.password),
@@ -45,8 +45,8 @@ def create_user(credentials: CreateUser, db: db_dependency):
 
 
 @router.post("/login", response_model=Token)
-def login(formdata: Annotated[OAuth2PasswordRequestForm, Depends()], db: db_dependency):
-    user = authenticate_user(formdata.username, formdata.password, db)
+def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: db_dependency):
+    user = authenticate_user(form_data.username, form_data.password, db)
 
     if not user:
         raise HTTPException(
@@ -62,13 +62,13 @@ async def authenticate_user_by_token(token: str, db: db_dependency):
     try:
         payload = jwt.decode(token, key=SECRET_KEY, algorithms=[ALGORITHM])
 
-        email: str = payload.get("email")
-        if email is None:
+        user_id: str = payload.get("id")
+        if user_id is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Could not validate user.",
             )
-        user_in_db = db.query(Users).filter(email == Users.email).first()
+        user_in_db = db.query(Users).filter(user_id == Users.id).first()
 
         if not user_in_db:
             raise HTTPException(
@@ -84,7 +84,7 @@ async def authenticate_user_by_token(token: str, db: db_dependency):
 
 @router.delete("/delete-user")
 def delete_user(
-    user: Annotated[OAuth2PasswordRequestForm, Depends()], db: db_dependency
+        user: Annotated[OAuth2PasswordRequestForm, Depends()], db: db_dependency
 ):
     user = authenticate_user(user.username, user.password, db)
 
@@ -115,11 +115,29 @@ def create_token_for_user(email: str, db: db_dependency):
     return create_token(user.email, user.creation_date, user.id)
 
 
-def create_token(email: str, creation_date: datetime, id: int):
-    payload = {"email": email, "creation_date": creation_date.isoformat(), "id": id}
+def create_token(email: str, creation_date: datetime, user_id: str):
+    payload = {"email": email, "creation_date": creation_date.isoformat(), "id": user_id}
     exp_claim = datetime.now() + timedelta(minutes=20)
     payload.update({"exp": exp_claim})
 
     token = jwt.encode(payload, algorithm=ALGORITHM, key=SECRET_KEY)
 
     return token
+
+
+def validate_token(token: str, db: db_dependency):
+    try:
+        payload = jwt.decode(token=token, key=SECRET_KEY, algorithms=[ALGORITHM])
+        user_id = payload.get("id")
+
+        if user_id is None:
+            return False
+
+        user = db.query(Users).filter(Users.id == user_id).first()
+
+        if not user:
+            return False
+
+        return user_id
+    except JWTError:
+        return False

@@ -1,9 +1,9 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, UUID4
 from datetime import datetime
 
 
 class BaseUserCredentialRequest:
-    email: str
+    email: EmailStr
     password: str
 
 
@@ -12,9 +12,9 @@ class CreateUser(BaseUserCredentialRequest, BaseModel):
 
 
 class FetchUserInfo(BaseModel):
-    id: int
+    id: UUID4
     name: str
-    email: str
+    email: EmailStr
     creation_date: datetime
     account_updated: datetime | None
 
