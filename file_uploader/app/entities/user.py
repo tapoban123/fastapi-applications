@@ -1,0 +1,1 @@
+# SQL Table structure for Users Table.
