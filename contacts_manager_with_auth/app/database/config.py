@@ -9,9 +9,9 @@ import os
 load_dotenv()
 
 DB_URL = os.environ.get("DATABASE_URL")
-SQLITE_DATABASE_URL = DB_URL
+DATABASE_URL = DB_URL
 
-engine = create_engine(SQLITE_DATABASE_URL)
+engine = create_engine(DATABASE_URL)
 
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
