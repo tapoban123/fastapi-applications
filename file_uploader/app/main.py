@@ -1,8 +1,13 @@
 from fastapi import FastAPI
-from .auth import services
+from .auth import controller
+from .database import core
+from .entities import file_data, user  # Importing to register them
+
+core.Base.metadata.create_all(bind=core.engine)
+
 
 app = FastAPI()
-app.include_router(services.router)
+app.include_router(controller.router)
 
 
 @app.get("/")

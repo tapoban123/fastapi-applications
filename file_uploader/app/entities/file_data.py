@@ -1,15 +1,17 @@
 # SQL Table for file data
 
-from ..database import core
-from sqlalchemy import Column, String, DateTime, func
+from ..database.core import Base
+from sqlalchemy import Column, String, DateTime, func, ForeignKey
 
 
-class FileData(core.Base):
-    __tablename__ = "users"
+class UserFiles(Base):
+    __tablename__ = "user_files"
 
-    id = Column(String, index=True, primary_key=True)
-    name = Column(String, nullable=False)
-    email = Column(String, nullable=False, unique=True)
-    hashed_password = Column(String, nullable=False)
-    created_at = Column(DateTime, nullable=False, server_default=func.now)
-    updated_at = Column(DateTime, nullable=False, onupdate=func.now)
+    id = Column(String, primary_key=True, index=True)
+    user_id = Column(String, ForeignKey("users.id"))
+    name = Column(String, nullable=True)
+    description = Column(String, nullable=True)
+    url = Column(String, nullable=False)
+    size = Column(String)
+    uploaded_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, onupdate=func.now())
