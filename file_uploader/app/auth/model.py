@@ -23,3 +23,13 @@ class GetUserInfo(BaseModel):
     email: EmailStr
     created_at: datetime
     updated_at: datetime | None
+
+
+class UpdateUserDetails(BaseModel):
+    name: str | None
+    email: str | None
+
+
+class ChangeUserPassword(BaseModel):
+    old_password: str
+    new_password: str

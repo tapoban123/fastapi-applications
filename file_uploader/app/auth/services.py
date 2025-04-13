@@ -7,6 +7,7 @@ from ..exceptions import (
     AccountNotFoundError,
     InvalidCredentialsError,
     UserValidationFailedError,
+    AccessTokenInvalidError,
 )
 import uuid
 from dotenv import load_dotenv
@@ -34,7 +35,9 @@ def create_user(name: str, email: str, password: str, db: db_dependency):
     db.add(new_user)
     db.commit()
 
-    return {"details": "success"}
+    token = generate_token(new_user.id)
+
+    return {"details": "success", "token": token, "valid_for": "30 days"}
 
 
 def user_login(email: str, password: str, db: db_dependency):
@@ -61,19 +64,22 @@ def generate_token(uid: str):
 
 
 def is_token_valid(token: str, db: db_dependency):
-    payload = jwt.decode(token, algorithms=[JWT_ALGORITHM], key=JWT_SECRET_KEY)
+    try:
+        payload = jwt.decode(token, algorithms=[JWT_ALGORITHM], key=JWT_SECRET_KEY)
 
-    uid = payload.get("uid")
+        uid = payload.get("uid")
 
-    if uid is None:
-        return False
+        if uid is None:
+            return False
 
-    user = db.query(Users).filter(Users.id == uid).first()
+        user = db.query(Users).filter(Users.id == uid).first()
 
-    if not user:
-        return False
+        if not user:
+            return False
 
-    return user
+        return user
+    except JWTError:
+        raise AccessTokenInvalidError()
 
 
 def authenticate_user(token: str, db: db_dependency):
@@ -88,12 +94,48 @@ def authenticate_user(token: str, db: db_dependency):
 def update_user(
     token: str, new_name: str | None, new_email: str | None, db: db_dependency
 ):
-    pass
+    user = is_token_valid(token, db)
+    if not user:
+        raise UserValidationFailedError()
+
+    # updating user
+    user.name = new_name if new_name is not None else user.name
+    user.email = new_email if new_email is not None else user.email
+
+    db.add(user)
+    db.commit()
+
+    return user
 
 
-def change_password():
-    pass
+def change_password(
+    token: str, old_password: str, new_password: str, db: db_dependency
+):
+    user = is_token_valid(token, db)
+    if not user:
+        raise UserValidationFailedError()
+
+    if not bycrypt_context.verify(old_password, user.hashed_password):
+        raise InvalidCredentialsError()
+
+    # updating old password
+    user.hashed_password = bycrypt_context.hash(new_password)
+    db.add(user)
+    db.commit()
+
+    return {"details": "success", "status": "password_changed"}
 
 
-def delete_user():
-    pass
+def delete_user(token: str, password: str, db: db_dependency):
+    user = is_token_valid(token, db)
+
+    if not user:
+        raise UserValidationFailedError()
+
+    if not bycrypt_context.verify(password, user.hashed_password):
+        raise InvalidCredentialsError()
+
+    db.query(Users).filter(Users.id == user.id).delete()
+    db.commit()
+
+    return {"details": "success", "status": "account_deleted"}
