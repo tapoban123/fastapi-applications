@@ -17,3 +17,9 @@ class InvalidCredentialsError(AuthExceptions):
     def __init__(self):
         message = "Invalid User Credentials."
         super().__init__(status_code=status.HTTP_401_UNAUTHORIZED, detail=message)
+
+
+class UserValidationFailedError(AuthExceptions):
+    def __init__(self):
+        message = "Failed to validate user."
+        super().__init__(status_code=status.HTTP_401_UNAUTHORIZED, detail=message)

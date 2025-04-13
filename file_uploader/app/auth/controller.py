@@ -1,15 +1,11 @@
 # Connects business logic with api routes
 
 
-from fastapi import APIRouter, status, HTTPException
+from fastapi import APIRouter, status, Header
 from .model import CreateNewUserModel, LoginUserModel, GetUserInfo
-from passlib.context import CryptContext
 from ..database.core import db_dependency
-from ..entities.user import Users
-import uuid
 from .services import *
-from dotenv import load_dotenv
-import os
+from typing import Annotated
 
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
@@ -28,3 +24,23 @@ def create_new_user(user_details: CreateNewUserModel, db: db_dependency):
 @router.post("/login-user")
 def login_user(user_details: LoginUserModel, db: db_dependency):
     return user_login(db=db, email=user_details.email, password=user_details.password)
+
+
+@router.get("/user-info", response_model=GetUserInfo)
+def get_user_details(token: Annotated[str, Header()], db: db_dependency):
+    return authenticate_user(token=token, db=db)
+
+
+@router.put("/update-user")
+def update_user_details():
+    pass
+
+
+@router.put("/change-password")
+def change_user_password():
+    pass
+
+
+@router.delete("/delete-user")
+def delete_user_account():
+    pass

@@ -18,7 +18,6 @@ class LoginUserModel(BaseModel, AuthModelBase):
 
 
 class GetUserInfo(BaseModel):
-    token: str
     id: str
     name: str
     email: EmailStr
