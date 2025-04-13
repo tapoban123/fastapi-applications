@@ -10,15 +10,13 @@ from ..exceptions import (
     AccessTokenInvalidError,
 )
 import uuid
-from dotenv import load_dotenv
-import os
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
+from enums import ENV_VALUES
 
-load_dotenv()
 
-JWT_SECRET_KEY = os.environ.get("SECRET_KEY")
-JWT_ALGORITHM = os.environ.get("ALGORITHM")
+JWT_SECRET_KEY = ENV_VALUES.JWT_SECRET_KEY.value
+JWT_ALGORITHM = ENV_VALUES.JWT_ALGORITHM.value
 
 
 bycrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

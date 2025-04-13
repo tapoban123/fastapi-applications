@@ -27,7 +27,7 @@ class GetUserInfo(BaseModel):
 
 class UpdateUserDetails(BaseModel):
     name: str | None
-    email: str | None
+    email: EmailStr | None
 
 
 class ChangeUserPassword(BaseModel):
