@@ -12,6 +12,7 @@ class UserFiles(Base):
     name = Column(String, nullable=True)
     description = Column(String, nullable=True)
     url = Column(String, nullable=False)
-    size = Column(String)
+    file_type = Column(String, nullable=True)
+    size = Column(String, nullable=True)
     uploaded_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, onupdate=func.now())
