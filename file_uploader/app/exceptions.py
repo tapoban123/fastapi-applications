@@ -29,3 +29,14 @@ class AccessTokenInvalidError(AuthExceptions):
     def __init__(self):
         message = "Invalid Access Token."
         super().__init__(status_code=status.HTTP_401_UNAUTHORIZED, detail=message)
+
+
+class FileUploadServiceExceptions(HTTPException):
+    """Base Exception for File Upload Service Errors."""
+    pass
+
+
+class FileSizeMoreThan5MBError(FileUploadServiceExceptions):
+    def __init__(self):
+        message = "File size must not exceed 5 MB."
+        super().__init__(status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, detail=message)

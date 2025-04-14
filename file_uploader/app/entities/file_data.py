@@ -9,7 +9,7 @@ class UserFiles(Base):
 
     id = Column(String, primary_key=True, index=True)
     user_id = Column(String, ForeignKey("users.id"))
-    name = Column(String, nullable=True)
+    name = Column(String, nullable=False)
     description = Column(String, nullable=True)
     url = Column(String, nullable=False)
     file_type = Column(String, nullable=True)

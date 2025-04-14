@@ -14,10 +14,8 @@ from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from enums import ENV_VALUES
 
-
 JWT_SECRET_KEY = ENV_VALUES.JWT_SECRET_KEY.value
 JWT_ALGORITHM = ENV_VALUES.JWT_ALGORITHM.value
-
 
 bycrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -77,7 +75,7 @@ def is_token_valid(token: str, db: db_dependency):
 
         return user
     except JWTError:
-        raise AccessTokenInvalidError()
+        return False
 
 
 def authenticate_user(token: str, db: db_dependency):
@@ -90,7 +88,7 @@ def authenticate_user(token: str, db: db_dependency):
 
 
 def update_user(
-    token: str, new_name: str | None, new_email: str | None, db: db_dependency
+        token: str, new_name: str | None, new_email: str | None, db: db_dependency
 ):
     user = is_token_valid(token, db)
     if not user:
@@ -107,7 +105,7 @@ def update_user(
 
 
 def change_password(
-    token: str, old_password: str, new_password: str, db: db_dependency
+        token: str, old_password: str, new_password: str, db: db_dependency
 ):
     user = is_token_valid(token, db)
     if not user:
