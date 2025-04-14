@@ -4,11 +4,11 @@ from ..auth.services import is_token_valid
 from fastapi import UploadFile
 from ..database.core import db_dependency
 from ..entities.file_data import UserFiles
-from utils import *
+from app.utils import *
 import uuid
 from ..exceptions import AccessTokenInvalidError, FileSizeMoreThan5MBError
 
-from enums import ENV_VALUES
+from app.enums import ENV_VALUES
 
 # Configuration
 cloudinary.config(
@@ -29,7 +29,6 @@ def upload_file(token: str,
         raise AccessTokenInvalidError()
 
     if not is_file_within_5mb(file.size):
-        print(file.size)
         raise FileSizeMoreThan5MBError()
 
     upload_result = cloudinary.uploader.upload(file.file, asset_folder=f"/{user.id}/assets", public_id=file_name)

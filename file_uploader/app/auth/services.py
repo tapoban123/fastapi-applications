@@ -7,12 +7,11 @@ from ..exceptions import (
     AccountNotFoundError,
     InvalidCredentialsError,
     UserValidationFailedError,
-    AccessTokenInvalidError,
 )
 import uuid
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
-from enums import ENV_VALUES
+from app.enums import ENV_VALUES
 
 JWT_SECRET_KEY = ENV_VALUES.JWT_SECRET_KEY.value
 JWT_ALGORITHM = ENV_VALUES.JWT_ALGORITHM.value
