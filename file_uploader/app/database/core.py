@@ -4,15 +4,12 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session
 from sqlalchemy.engine import create_engine
 from fastapi import Depends
-from dotenv import load_dotenv
 from typing import Annotated
-import os
+from ..enums import ENV_VALUES
 
-
-DATABASE_URL = "sqlite:///users.db"
+DATABASE_URL = ENV_VALUES.POSTGRES_DATABASE_URL.value
 
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
-
 
 Base = declarative_base()
 

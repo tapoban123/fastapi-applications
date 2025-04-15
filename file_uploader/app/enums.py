@@ -6,6 +6,7 @@ load_dotenv()
 
 
 class ENV_VALUES(Enum):
+    POSTGRES_DATABASE_URL = os.environ.get("DATABASE_URL")
     JWT_SECRET_KEY = os.environ.get("SECRET_KEY")
     JWT_ALGORITHM = os.environ.get("ALGORITHM")
     CLOUDINARY_API_KEY = os.environ.get("CLOUDINARY_API_KEY")
