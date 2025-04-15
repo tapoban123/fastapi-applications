@@ -9,7 +9,8 @@ from ..enums import ENV_VALUES
 
 DATABASE_URL = ENV_VALUES.POSTGRES_DATABASE_URL.value
 
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+# engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+engine = create_engine(DATABASE_URL)
 
 Base = declarative_base()
 
