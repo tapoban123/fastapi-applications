@@ -11,11 +11,14 @@ router = APIRouter(prefix="/file", tags=["File Upload Service"])
 def upload_file_to_server(token: Annotated[str, Header(title="Enter auth token")],
                           db: db_dependency,
                           file_name: str = Form(...),
+                          resource_id: str = Form(default=uuid.uuid4(),
+                                                  min_length=1, ),
                           description: str = Form(...),
                           file: UploadFile = File(...),
                           ):
     return upload_file(token, file=file,
                        db=db,
+                       resource_id=resource_id,
                        file_name=file_name,
                        description=description)
 

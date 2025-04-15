@@ -40,3 +40,9 @@ class FileSizeMoreThan5MBError(FileUploadServiceExceptions):
     def __init__(self):
         message = "File size must not exceed 5 MB."
         super().__init__(status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, detail=message)
+
+
+class DuplicateAssetNameError(FileUploadServiceExceptions):
+    def __init__(self):
+        message = "Resource ID must be unique."
+        super().__init__(status_code=status.HTTP_400_BAD_REQUEST, detail=message)
