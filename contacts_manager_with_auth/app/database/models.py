@@ -1,4 +1,5 @@
-from sqlalchemy import Column, String, Integer, DateTime, Uuid, ForeignKey
+from sqlalchemy import Column, String, DateTime, ForeignKey
+from sqlalchemy.dialects.mysql import INTEGER
 from app.database.config import Base
 from sqlalchemy.sql import func
 
@@ -20,7 +21,7 @@ class Contacts(Base):
     id = Column(String, primary_key=True, index=True)
     user_id = Column(String, ForeignKey("users.id"), nullable=False)
     name = Column(String, nullable=False)
-    contact_number = Column(Integer, nullable=False)
+    contact_number = Column(INTEGER(10), nullable=False)
     country_code = Column(String, nullable=False)
     description = Column(String, nullable=True)
     creation_datetime = Column(DateTime(timezone=True), server_default=func.now())

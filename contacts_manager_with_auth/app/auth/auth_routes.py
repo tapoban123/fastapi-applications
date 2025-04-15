@@ -29,6 +29,9 @@ bcrypt_context = CryptContext(
 
 @router.post("/create-user", status_code=status.HTTP_201_CREATED, response_model=Token)
 def create_user(credentials: CreateUser, db: db_dependency):
+    is_user_exists = db.query(Users).filter(Users.email == credentials.email).first()
+    if is_user_exists:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="User already exists.")
     user_model = Users(
         id=uuid.uuid4().hex,
         name=credentials.name,

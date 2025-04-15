@@ -14,7 +14,7 @@
 
 - **Create User:** `/auth/create-user`
 - **Login User:** `/auth/login`
-- **Authenticate User:** `/auth/login`
+- **Authenticate User:** `/auth/authenticate-user`
 - **Delete User:** `/auth/delete-user`
 
 ### Contacts Services:
