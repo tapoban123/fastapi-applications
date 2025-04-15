@@ -23,7 +23,6 @@ cloudinary.config(
 
 def upload_file(token: str,
                 file_name: str,
-                resource_id: str,
                 description: str,
                 file: UploadFile, db: db_dependency):
     user = is_token_valid(token, db)
@@ -34,6 +33,7 @@ def upload_file(token: str,
     if not is_file_within_5mb(file.size):
         raise FileSizeMoreThan5MBError()
 
+    resource_id = uuid.uuid4().hex
     try:
         check_asset(public_id=resource_id, type="upload")
         raise DuplicateAssetNameError()
@@ -43,7 +43,7 @@ def upload_file(token: str,
                                                    display_name=file_name)
 
         file_data = UserFiles(
-            id=resource_id,
+            resource_id=resource_id,
             user_id=user.id,
             name=file_name,
             description=description,
@@ -72,7 +72,7 @@ def fetch_all_files(token: str, db: db_dependency):
     }
 
 
-def rename_asset(token: str, resource_id: str, new_name: str, db: db_dependency):
+def update_asset(token: str, resource_id: str, new_name: str | None, description: str | None, db: db_dependency):
     user = is_token_valid(token, db)
 
     if not user:
@@ -80,12 +80,24 @@ def rename_asset(token: str, resource_id: str, new_name: str, db: db_dependency)
 
     try:
         cloudinary.api.update(public_id=resource_id, display_name=new_name)
+        file = db.query(UserFiles).filter(UserFiles.id == resource_id).first()
+        updated_file_data = UserFiles(
+            resource_id=resource_id,
+            user_id=user.id,
+            name=new_name if new_name is not None else file.name,
+            description=description if description is not None else file.description,
+            url=file.url,
+            file_type=file.file_type,
+            size=file.size,
+        )
+        db.add(updated_file_data)
+        db.commit()
         return {"details": "Update success"}
     except CloundinaryNotFoundException:
         return {"details": "Resource update failed"}
 
 
-def delete_assets(token: str, resource_id: str, db: db_dependency):
+def delete_asset(token: str, resource_id: str, db: db_dependency):
     user = is_token_valid(token, db)
 
     if not user:
@@ -94,6 +106,7 @@ def delete_assets(token: str, resource_id: str, db: db_dependency):
     try:
         cloudinary.uploader.destroy(resource_id)
         db.query(UserFiles).filter(UserFiles.id == resource_id).delete()
+        db.commit()
         return {"details": "deleted_successfully"}
 
     except CloundinaryNotFoundException:

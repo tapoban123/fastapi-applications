@@ -31,6 +31,12 @@ class AccessTokenInvalidError(AuthExceptions):
         super().__init__(status_code=status.HTTP_401_UNAUTHORIZED, detail=message)
 
 
+class UserAlreadyExistsError(AuthExceptions):
+    def __init__(self):
+        message = "Account already exists with that email id."
+        super().__init__(status_code=status.HTTP_409_CONFLICT, detail=message)
+
+
 class FileUploadServiceExceptions(HTTPException):
     """Base Exception for File Upload Service Errors."""
     pass

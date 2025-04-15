@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 
 
-class UploadFileData(BaseModel):
-    file_name: str
-    description: str | None
+class UpdateFileData(BaseModel):
+    resource_id: str
+    new_asset_name: str | None
+    new_description: str | None

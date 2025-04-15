@@ -7,7 +7,7 @@ from sqlalchemy import Column, String, DateTime, func, ForeignKey
 class UserFiles(Base):
     __tablename__ = "user_files"
 
-    id = Column(String, primary_key=True, index=True)
+    resource_id = Column(String, primary_key=True, index=True)
     user_id = Column(String, ForeignKey("users.id"))
     name = Column(String, nullable=False)
     description = Column(String, nullable=True)

@@ -7,6 +7,7 @@ from ..exceptions import (
     AccountNotFoundError,
     InvalidCredentialsError,
     UserValidationFailedError,
+    UserAlreadyExistsError
 )
 import uuid
 from jose import JWTError, jwt
@@ -20,6 +21,10 @@ bycrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def create_user(name: str, email: str, password: str, db: db_dependency):
+    is_user_exists = db.query(Users).filter(Users.email == email).first()
+    if is_user_exists:
+        raise UserAlreadyExistsError()
+
     new_user = Users(
         id=uuid.uuid4().hex,
         name=name,
