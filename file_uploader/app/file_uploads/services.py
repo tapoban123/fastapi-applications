@@ -43,7 +43,7 @@ def upload_file(token: str,
                                                    display_name=file_name)
 
         file_data = UserFiles(
-            id=uuid.uuid4().hex,
+            id=resource_id,
             user_id=user.id,
             name=file_name,
             description=description,
@@ -70,3 +70,31 @@ def fetch_all_files(token: str, db: db_dependency):
         "uid": user.id,
         "data": user_files
     }
+
+
+def rename_asset(token: str, resource_id: str, new_name: str, db: db_dependency):
+    user = is_token_valid(token, db)
+
+    if not user:
+        raise AccessTokenInvalidError()
+
+    try:
+        cloudinary.api.update(public_id=resource_id, display_name=new_name)
+        return {"details": "Update success"}
+    except CloundinaryNotFoundException:
+        return {"details": "Resource update failed"}
+
+
+def delete_assets(token: str, resource_id: str, db: db_dependency):
+    user = is_token_valid(token, db)
+
+    if not user:
+        raise AccessTokenInvalidError()
+
+    try:
+        cloudinary.uploader.destroy(resource_id)
+        db.query(UserFiles).filter(UserFiles.id == resource_id).delete()
+        return {"details": "deleted_successfully"}
+
+    except CloundinaryNotFoundException:
+        return {"details": "deletion_failed"}
