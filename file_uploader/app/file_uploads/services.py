@@ -80,17 +80,12 @@ def update_asset(token: str, resource_id: str, new_name: str | None, description
 
     try:
         cloudinary.api.update(public_id=resource_id, display_name=new_name)
-        file = db.query(UserFiles).filter(UserFiles.id == resource_id).first()
-        updated_file_data = UserFiles(
-            resource_id=resource_id,
-            user_id=user.id,
-            name=new_name if new_name is not None else file.name,
-            description=description if description is not None else file.description,
-            url=file.url,
-            file_type=file.file_type,
-            size=file.size,
-        )
-        db.add(updated_file_data)
+        file_data = db.query(UserFiles).filter(UserFiles.resource_id == resource_id).first()
+
+        file_data.name = new_name if new_name is not None else file_data.name
+        file_data.description = description if description is not None else file_data.description
+
+        db.add(file_data)
         db.commit()
         return {"details": "Update success"}
     except CloundinaryNotFoundException:
@@ -105,7 +100,7 @@ def delete_asset(token: str, resource_id: str, db: db_dependency):
 
     try:
         cloudinary.uploader.destroy(resource_id)
-        db.query(UserFiles).filter(UserFiles.id == resource_id).delete()
+        db.query(UserFiles).filter(UserFiles.resource_id == resource_id).delete()
         db.commit()
         return {"details": "deleted_successfully"}
 
